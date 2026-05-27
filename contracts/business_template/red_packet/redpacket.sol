@@ -61,16 +61,13 @@ contract mytoken is  IERC20 {
        emit Transfer(msg.sender, _to, _value);
        return true;
    }
-   function approve(address _spender, uint256 _value) override external returns (bool success) {
-       success = false;
+   function approve(address _spender, uint256 _value) override external returns (bool) {
        require(_value > 0, "_value must > 0");
        require(address(0) != _spender, "_spender must a valid address");
-       require(balances[msg.sender] >= _value, "user's balance must enough");
        
        allows[msg.sender][_spender] = _value;
        
        emit Approval(msg.sender, _spender, _value);
-       success = true;
        return true;
    }
    function transferFrom(address _from, address _to, uint256 _value) override external returns (bool success) {

@@ -60,6 +60,7 @@ library LibSafeMathForUint256Utils {
         for(uint256 i = 0; i < b; i++){
             c = mul(c, a);
         }
+        return c;
     }
 
     function max(uint256 a, uint256 b) internal pure returns (uint256) {

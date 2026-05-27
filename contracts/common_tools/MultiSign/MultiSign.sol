@@ -33,7 +33,7 @@ abstract contract MultiSign {
     }
 
     constructor(address[] memory addressParams, uint minSignaturesParam) {
-        require(minSignatures <= addressParams.length + 1, "The number of signatures cannot be greater than the signers.");
+        require(minSignaturesParam <= addressParams.length + 1, "The number of signatures cannot be greater than the signers.");
         for(uint i=0; i<addressParams.length; i++){
             require(msg.sender != addressParams[i], "Contract creator cannot be passed in as a parameter.");
         }
@@ -75,16 +75,15 @@ abstract contract MultiSign {
         require(msg.sender != transaction.from, "Signer cannot be initiator.");
         require(transaction.hasSign[msg.sender] != 1, "Cannot duplicate signature.");
 
-        if(signFinished(transactionId)){
-            transaction.signers.push(msg.sender);
-            transaction.hasSign[msg.sender] = 1;
-            transaction.signCount++;
-            return true;
-        }
+        bool alreadyFinished = signFinished(transactionId);
 
         transaction.signers.push(msg.sender);
         transaction.hasSign[msg.sender] = 1;
         transaction.signCount++;
+
+        if (alreadyFinished) {
+            return true;
+        }
 
         if (transaction.signCount >= minSignatures) {
             removePendingTransactions(transactionId);

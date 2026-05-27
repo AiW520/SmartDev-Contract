@@ -100,7 +100,7 @@ contract Supplychain {
             (-1,0) -转让失败，不能转让给自己
             (-2,0) -转让失败，转让金额超过拥有的最大金额（结算了的应收账款单据不能转让）
     */
-    function tansfer(address new_to, string memory _product, uint _amount) public returns(int256,uint){
+    function transfer(address new_to, string memory _product, uint _amount) public returns(int256,uint){
         address _to = msg.sender;//单据持有方发起转让
         //计算函数调用的来源地址拥有的未结算应收账款金额之和
         uint allamount = 0;
@@ -203,6 +203,7 @@ contract Supplychain {
                         receivables[i].amount=_amount;
                         receivables[i].to=new_to;
                         receivables[i].product="money";
+                        require(balances[new_to] >= _amount, "bank insufficient balance");
                         balances[_to] += _amount;
                         balances[new_to] -= _amount;
                         return (0,i);
@@ -219,6 +220,7 @@ contract Supplychain {
                             isconfirmed:receivables[i].isconfirmed//是否经第三方可信机构认证
                         });
                         //储蓄金额转入和转出
+                        require(balances[new_to] >= _amount, "bank insufficient balance");
                         balances[_to] += _amount;
                         balances[new_to] -= _amount;
                         return (0,rid);
@@ -235,6 +237,7 @@ contract Supplychain {
         //涉及多个应收账款单据
         if(allamount>=_amount){
             //储蓄金额转入和转出
+            require(balances[new_to] >= _amount, "bank insufficient balance");
             balances[new_to] -= _amount;
             balances[_to] += _amount;
             //遍历rindex表，处理相应id的应收账款单据
@@ -277,6 +280,7 @@ contract Supplychain {
          address cur = msg.sender;
          if(cur != kernelCompany) return -1;
          receivables[r_id].status=RStatus.paid;
+         require(balances[cur] >= receivables[r_id].amount, "insufficient balance");
          balances[cur] -= receivables[r_id].amount;
          balances[receivables[r_id].to] += receivables[r_id].amount;
          return 0;

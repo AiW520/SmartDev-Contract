@@ -369,7 +369,7 @@ contract PatientRecords is InterfacePatientRecords, TokenDestructible {
         private
         notNull(_patientAddress)
     {
-        springToken.transfer(_patientAddress, tokenRewardAmount);
+        require(springToken.transfer(_patientAddress, tokenRewardAmount), "token transfer failed");
         emit PatientPaid(_patientAddress);
     }
 
